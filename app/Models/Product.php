@@ -10,12 +10,17 @@ use HasMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Magazine\Entities\ProductView;
+use Spatie\MediaLibrary\Conversions\Conversion;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use SubcategoryScope;
+use Viewable;
 
 class Product extends Model
 {
     use HasFactory;
-    use HasMedia;
+    use InteractsWithMedia;
 
     protected $fillable = [
         'name',
@@ -43,11 +48,9 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    protected static function booted()
+    public function views(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
-        static::addGlobalScope(new CategoryScope);
-        static::addGlobalScope(new BrandScope);
-        static::addGlobalScope(new SubcategoryScope);
+        return $this->morphMany(ProductView::class, 'viewable');
     }
 
     public function scopeInMinPrice($query, $minPrice)
@@ -74,5 +77,35 @@ class Product extends Model
                 ->where('parent_id', $parentCategory);
         })
             ->where('id', '!=', $this->id);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('image')
+            ->singleFile();
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('main')
+            ->keepOriginalImageFormat()
+            ->performOnCollections('image');
+    }
+
+    public function scopeInSubCategory($query, ...$subcategories)
+    {
+        return $query->whereIn('subcategory_id', $subcategories);
+    }
+
+    public function scopeInCategory($query, ...$categories)
+    {
+        $query->whereHas('subcategory', function ($query) use ($categories) {
+            return $query->whereIn('parent_id', $categories);
+        });
+    }
+
+    public function scopeInBrand($query, ...$brands)
+    {
+        return $query->whereIn('brand_id', $brands);
     }
 }
