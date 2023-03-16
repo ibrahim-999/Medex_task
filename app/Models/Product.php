@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use BrandScope;
+use Carbon\Carbon;
 use CategoryScope;
 use Database\Factories\CategoryFactory;
 use Database\Factories\ProductFactory;
 use HasMedia;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -107,5 +109,21 @@ class Product extends Model
     public function scopeInBrand($query, ...$brands)
     {
         return $query->whereIn('brand_id', $brands);
+    }
+
+    public static function scopeTrending(Builder $query): Builder
+    {
+        $lastMonth = Carbon::now()->subMonth();
+
+        return $query
+            ->leftJoinSub(
+                ProductView::whereViewableType(static::class)->whereMonth('month', $lastMonth),
+                'views',
+                'products.id',
+                '=',
+                'views.viewable_id'
+            )
+            ->orderBy('views.count', 'desc')
+            ->select('products.*');
     }
 }
