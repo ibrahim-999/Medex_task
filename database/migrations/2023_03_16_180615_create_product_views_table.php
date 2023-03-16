@@ -16,6 +16,7 @@ return new class extends Migration
             $table->ulidMorphs('viewable');
             $table->bigInteger('count');
             $table->date('month');
+            $table->dateTime('published_at')->nullable();
             $table->timestamps();
             $table->unique(['viewable_type', 'viewable_id', 'month']);
         });

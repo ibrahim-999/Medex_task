@@ -21,6 +21,7 @@ class ProductView extends Model
 
     protected $casts = [
         'month' => 'date:m-Y',
+        'published_at' => 'datetime'
     ];
 
     protected static function newFactory() : ProductViewFactory

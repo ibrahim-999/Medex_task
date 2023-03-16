@@ -2,12 +2,8 @@
 
 namespace App\Models;
 
-use BrandScope;
 use Carbon\Carbon;
-use CategoryScope;
-use Database\Factories\CategoryFactory;
 use Database\Factories\ProductFactory;
-use HasMedia;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +25,11 @@ class Product extends Model
         'quantity',
         'subcategory_id',
         'brand_id',
+        'published_at'
+    ];
+
+    protected $casts = [
+        'published_at' => 'datetime'
     ];
 
     protected static function newFactory(): ProductFactory
@@ -119,7 +120,15 @@ class Product extends Model
                 '=',
                 'views.viewable_id'
             )
+            ->where('products.published_at', '<=', Carbon::now())
             ->orderBy('views.count', 'desc')
             ->select('products.*');
+    }
+
+    public static function scopeRecent(Builder $query): Builder
+    {
+        return $query
+            ->where('published_at', '<=', Carbon::now())
+            ->orderBy('published_at', 'desc');
     }
 }

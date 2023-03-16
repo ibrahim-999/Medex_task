@@ -20,6 +20,7 @@ return new class extends Migration
             $table->longText('long_description');
             $table->integer('price')->default(0);
             $table->integer('quantity');
+            $table->dateTime('published_at')->nullable();
             $table->timestamps();
 
             $table->foreignId('subcategory_id')

@@ -27,6 +27,7 @@ class ProductFactory extends Factory
             'brand_id' => Brand::newFactory(),
             'price' => $this->faker->numberBetween(1000, 2000),
             'quantity' => $this->faker->numberBetween(10, 20),
+            'published_at' => $this->faker->dateTime
         ];
     }
 }

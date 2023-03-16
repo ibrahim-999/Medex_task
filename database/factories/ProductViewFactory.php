@@ -23,6 +23,7 @@ class ProductViewFactory extends Factory
             'month' => Carbon::now(),
             'viewable_type' => Product::class,
             'viewable_id' => Product::factory(),
+            'published_at' => $this->faker->dateTime
         ];
     }
 }
