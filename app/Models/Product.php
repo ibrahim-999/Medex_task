@@ -52,18 +52,38 @@ class Product extends Model
         return $this->morphMany(ProductView::class, 'viewable');
     }
 
+    public function offers()
+    {
+        return $this
+            ->belongsToMany(Offer::class, 'product_offers')
+            ->withPivot('price')
+            ->using(ProductOffer::class);
+    }
+
     public function scopeInMinPrice($query, $minPrice)
     {
         $minPrice *= 100;
             return $query
-                ->where('price', '>=', $minPrice);
+                ->where('price', '>=', $minPrice)
+                ->orWhereHas('offers', function ($q) use ($minPrice) {
+                return $q
+                    ->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now())
+                    ->where('price', '>=', $minPrice);
+            });
     }
 
     public function scopeInMaxPrice($query, $maxPrice)
     {
         $maxPrice *= 100;
             return $query
-                ->where('price', '<=', $maxPrice);
+                ->where('price', '<=', $maxPrice)
+                ->orWhereHas('offers', function ($q) use ($maxPrice) {
+                return $q
+                    ->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now())
+                    ->where('price', '<=', $maxPrice);
+            });
     }
 
     public function similarProducts($query)
@@ -131,4 +151,15 @@ class Product extends Model
             ->where('published_at', '<=', Carbon::now())
             ->orderBy('published_at', 'desc');
     }
+
+    public function scopeIsOffer($query)
+    {
+        $query
+            ->whereHas('offers', function ($q) {
+            return $q
+                ->where('start_date', '<=', Carbon::now())
+                ->where('end_date', '>=', Carbon::now());
+        });
+    }
+
 }

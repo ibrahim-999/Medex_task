@@ -19,7 +19,7 @@ class ProductController extends Controller
             ->withQueryString();
 
         $props = [
-            'products' => new PaginatedCollection($trendyProducts, ProductResource::class),
+            'trendyProducts' => new PaginatedCollection($trendyProducts, ProductResource::class),
         ];
 
         return view('product');
@@ -34,9 +34,26 @@ class ProductController extends Controller
             ->withQueryString();
 
         $props = [
-            'products' => new PaginatedCollection($recentProducts, ProductResource::class),
+            'recentProducts' => new PaginatedCollection($recentProducts, ProductResource::class),
         ];
 
         return view('product');
     }
+
+    public function offerProducts()
+    {
+        $offerProducts = QueryBuilder::for(Product::class)
+            ->isOffer()
+            ->defaultSort('-created_at')
+            ->paginate()
+            ->withQueryString();
+
+        $props = [
+            'offerProducts' => new PaginatedCollection($offerProducts, ProductResource::class),
+        ];
+
+        dd($props);
+        return view('product');
+    }
+
 }
