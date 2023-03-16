@@ -22,5 +22,7 @@ Route::get('/', function () {
 
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/brands', [BrandController::class, 'index']);
-Route::get('/products', [ProductController::class, 'index']);
+Route::get('/trending', [ProductController::class, 'trendingProducts']);
+Route::get('/recent', [ProductController::class, 'recentProducts']);
+Route::get('/offer', [ProductController::class, 'offerProducts']);
 
