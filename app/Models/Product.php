@@ -6,6 +6,7 @@ use BrandScope;
 use CategoryScope;
 use Database\Factories\CategoryFactory;
 use Database\Factories\ProductFactory;
+use HasMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +15,7 @@ use SubcategoryScope;
 class Product extends Model
 {
     use HasFactory;
+    use HasMedia;
 
     protected $fillable = [
         'name',
@@ -48,5 +50,29 @@ class Product extends Model
         static::addGlobalScope(new SubcategoryScope);
     }
 
+    public function scopeInMinPrice($query, $minPrice)
+    {
+        $minPrice *= 100;
+            return $query
+                ->where('price', '>=', $minPrice);
+    }
 
+    public function scopeInMaxPrice($query, $maxPrice)
+    {
+        $maxPrice *= 100;
+            return $query
+                ->where('price', '<=', $maxPrice);
+    }
+
+    public function similarProducts($query)
+    {
+        $parentCategory = $this->subcategory->parent_id;
+
+        return $query
+            ->whereHas('subcategory', function ($query) use ($parentCategory) {
+            $query
+                ->where('parent_id', $parentCategory);
+        })
+            ->where('id', '!=', $this->id);
+    }
 }
