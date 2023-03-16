@@ -52,7 +52,6 @@ class ProductController extends Controller
             'offerProducts' => new PaginatedCollection($offerProducts, ProductResource::class),
         ];
 
-        dd($props);
         return view('product');
     }
 
