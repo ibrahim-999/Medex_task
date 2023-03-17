@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Resources\BrandResource;
 use App\Http\Resources\PaginatedCollection;
 use App\Models\Brand;
-use App\Models\Category;
-use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class BrandController extends Controller
