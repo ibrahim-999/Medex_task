@@ -12,7 +12,7 @@ class BrandApiController extends Controller
     public function index()
     {
         return ApiResponse::success([
-            'cities' => BrandResource::collection(Brand::paginate())
+            'brands' => BrandResource::collection(Brand::paginate())
         ]);
     }
 }
